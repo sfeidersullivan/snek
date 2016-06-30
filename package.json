@@ -1,26 +1,23 @@
 {
-  "name": "blessed-life",
-  "version": "1.1.2",
-  "description": "A simple game of life simulation using the blessed node module.",
-  "keywords": ["game", "life", "conway", "simulation", "blessed"],
+  "name": "snek",
+  "version": "1.0.0",
+  "description": "A snake game",
   "main": "index.js",
   "bin": {
-    "blessed-life": "./bin/runner.js"
+    "snek": "./bin/runner.js"
   },
   "directories": {
     "lib": "lib",
-    "example": "example",
     "bin": "bin"
   },
   "dependencies": {
-    "blessed": "~0.0.25",
-    "commander": "~2.0.0"
+    "blessed": "^0.1.81",
+    "commander": "^2.9.0",
+    "lodash": "^4.13.1"
   },
-  "author": "Coalman <tehcoalman@gmail.com> (http://github.com/Coalman)",
+  "author": "perfectsquircle",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Coalman/blessed-life.git"
-  },
-  "homepage": "https://github.com/Coalman/blessed-life",
-  "preferGlobal": "true"
+    "url": "https://github.com/perfectsquircle/snek.git"
+  }
 }

@@ -1,10 +1,9 @@
-blessed-life
+snek
 ============
 
-This is a simple simulation of Conway's game of life. It's written in javascript for nodejs and targets the command line. It utilizes the following nodejs modules:
+A snake game.
 
- - [commander] for the command-line interface.
- - [blessed]: a curses-like library.
+Forked from coalman/blessed-life
 
 Getting Started
 ---------------
@@ -13,24 +12,20 @@ Getting Started
 
 Make sure you have [node.js][nodejs] properly installed. Then use `npm` to install:
 
-    $ npm install -g blessed-life
+    $ npm install -g snek
 
 You will probably have to run this command as root like so:
 
-    $ sudo npm install -g blessed-life
+    $ sudo npm install -g snek
 
 ### Configuration
 
-You can write configurations for blessed-life in json. Some examples are given in the `example` directory in this repo.
+You can write configurations for snek in json. Some examples are given in the `example` directory in this repo.
 
 ### Running
 
 You can start the program by opening a terminal and entering:
 
-    $ blessed-life
+    $ snek
 
-There are many command line switches that can be used (use `-h` or `--help` for more information). You can specify a certain configuration file to use by using the `-c` or `--config` switch:
-
-    $ blessed-life -c example/glider.json
-
-Make sure the value for this switch is a valid path. An [asciicast][asciinema] can be found [here][asciicast].
+There are many command line switches that can be used (use `-h` or `--help` for more information). 

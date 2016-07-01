@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 
+
+var _ = require("lodash");
+
 var program = require('commander');
 var blessed = require('blessed');
 var fs = require('fs');
@@ -44,7 +47,15 @@ var config = {
 	liveCells: configFile.liveCells || []
 };
 
-var screen = blessed.screen();
+var screen = blessed.screen({
+	debug: true
+});
+
+var origlog = console.log.bind(console);
+console.log = function() {
+	// console.dir(screen);
+	screen.debug.apply(screen, arguments);
+};
 
 config.width = 50;
 config.height = 25;
@@ -63,10 +74,10 @@ var app = new App(config, controller);
 
 // Create ui components
 var box = blessed.box({
-  top: 3,
-  left: 3,
-  width: '100%',
-  height: '100%',
+	top: 2,
+  left: 2,
+  width: config.width,
+  height: config.height + 1,
   content: app.renderBoard(),
   tags: true,
   style: {

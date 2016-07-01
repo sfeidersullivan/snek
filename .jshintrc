@@ -1,0 +1,6 @@
+{
+  "node": true,
+  "undef": true,
+  "strict": false,
+  "esversion": 6
+}

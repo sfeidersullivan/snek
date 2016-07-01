@@ -18,10 +18,6 @@ You will probably have to run this command as root like so:
 
     $ sudo npm install -g snek
 
-### Configuration
-
-You can write configurations for snek in json. Some examples are given in the `example` directory in this repo.
-
 ### Running
 
 You can start the program by opening a terminal and entering:

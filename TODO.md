@@ -5,6 +5,7 @@
 * Externalize controls
 * Add command line flag to use a bot
 * Add a command line flag to run "headless" and repeat n times
+* Maps?
 
 # Challenge
 * Add rules to readme

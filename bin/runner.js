@@ -1,83 +1,80 @@
 #!/usr/bin/env node
 'use strict';
 
-
-var _ = require("lodash");
-
 var program = require('commander');
 var blessed = require('blessed');
-var fs = require('fs');
 var path = require('path');
 var Ticker = require('../lib/ticker.js');
 var App = require('../lib/app.js');
 
-program._name = 'blessed-life';
-program.usage('[options] <config>')
+program._name = 'snek';
+program.usage('[options] <player1> <player2>')
 	.option('--width <width>', 
 		'specify the width of the grid', parseInt)
 	.option('--height <height>', 
 		'specify the height of the grid', parseInt)
-	.option('--livecell <ch>', 
-		'specify the char to use for live cells')
-	.option('--deadcell <ch>', 
-		'specify the char to use for dead cells')
-	.option('--fg <color>', 
-		'specify the foreground color of the simulation.')
-	.option('--bg <color>', 
-		'specify the background color of the simulation.')
 	.option('--speed <speed>', 
 		'specify the speed in milliseconds for each tick')
 	.option('-a, --autostart', 
 		'whether or not to automatically start the simulation')
 	.parse(process.argv);
-var configFile = {};
-if (program.args.length > 0) {
-	var configPath = path.resolve(program.args[0]);
-	var json = fs.readFileSync(configPath, { encoding: 'utf-8' });
-	configFile = JSON.parse(json);
-}
+	
 var config = {
-	width: (!isNaN(program.width) ? program.width : configFile.width || 0),
-	height: (!isNaN(program.height) ? program.height : configFile.height || 0),
-	liveCell: program.livecell || configFile.livecell || '█',
-	deadCell: program.deadcell || configFile.deadcell || ' ',
-	speed: program.speed || configFile.speed || 250,
-	fg: program.fg || configFile.fg || 'white',
-	bg: program.bg || configFile.bg || 'black',
-	liveCells: configFile.liveCells || []
+	width: program.width || 50,
+	height: program.height || 25,
+	speed: program.speed || 250
 };
 
 var screen = blessed.screen({
 	debug: true
 });
 
-var origlog = console.log.bind(console);
-console.log = function() {
-	// console.dir(screen);
-	screen.debug.apply(screen, arguments);
-};
+function keyboardController() {
+	var controller = {
+		nextMove: "",
+		getNextMove: function() {
+			var move = this.nextMove;
+			this.nextMove = "";
+			return move;
+		}
+	};
 
-config.width = 50;
-config.height = 25;
+	screen.key(['a'], function(ch, key) {
+	    controller.nextMove = "left";
+	});
 
-var controller = {
-	nextMove: "",
+	screen.key(['s'], function(ch, key) {
+		controller.nextMove = "right";
+	});
+
+	return controller;
+}
+
+var controller1;
+var controller2;
+
+if (program.args[0] === "k" || !program.args[0]) {
+	controller1 = keyboardController();
+	controller1.name = "Player 1";
+} else {
+	controller1 = require(path.resolve(process.cwd(), program.args[0]));
+}	
+
+if (program.args[1] === "k") {
+	controller2 = keyboardController();
+	controller2.name = "Player 2";
+} else if (program.args[1]) {
+	controller2 = require(path.resolve(process.cwd(), program.args[1]));
+}	
 	
-	getNextMove: function() {
-		var move = this.nextMove;
-		this.nextMove = "";
-		return move;
-	}
-};
-
-var app = new App(config, controller);
+var app = new App(config, controller1, controller2);
 
 // Create ui components
 var box = blessed.box({
 	top: 2,
   left: 2,
   width: config.width,
-  height: config.height + 1,
+  height: config.height + 2,
   content: app.renderBoard(),
   tags: true,
   style: {
@@ -110,16 +107,13 @@ screen.key(['p'], function(ch, key) {
 	ticker.toggle();
 });
 
-screen.key(['a'], function(ch, key) {
-	controller.nextMove = "left";
-});
-
-screen.key(['s'], function(ch, key) {
-	controller.nextMove = "right";
-});
-
 screen.key(['escape', 'q', 'C-c'], function(ch, key) {
   return process.exit(0);
 });
 
 screen.render();
+
+
+console.log = function() {
+	screen.debug.apply(screen, arguments);
+};

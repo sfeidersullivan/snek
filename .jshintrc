@@ -1,6 +1,6 @@
 {
   "node": true,
   "undef": true,
-  "strict": false,
-  "esversion": 6
+  "unused": "vars",
+  "strict": false
 }

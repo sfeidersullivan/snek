@@ -1,7 +1,6 @@
 ### TODO:
 
 # Code:
-* Add instructions to readme
 * Externalize controls
 * Add command line flag to use a bot
 * Add a command line flag to run "headless" and repeat n times
@@ -9,6 +8,7 @@
 
 # Challenge
 * Add rules to readme
+* Add challenge details to readme
 * Create bracket format
 
 # Multiplayer

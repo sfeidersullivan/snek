@@ -2,9 +2,9 @@ var _ = require("lodash");
 var elements = require("../lib/elements");
 var directions = require("../lib/directions");
 
-module.exports.getNextMove = function(game, player) {
-  // PUT YOUR ALGORITHM HERE
-  
+module.exports.name = "Naïve Norman";
+
+module.exports.getNextMove = function(game, player) { 
   /***************************
    * BEGIN EXAMPLE ALGORITHM *
    ***************************/

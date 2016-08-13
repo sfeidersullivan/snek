@@ -15,14 +15,16 @@ program.usage('[options] <player1> <player2>')
 		'specify the height of the grid', parseInt)
 	.option('--speed <speed>', 
 		'specify the speed in milliseconds for each tick')
-	.option('-a, --autostart', 
-		'whether or not to automatically start the simulation')
+	.option('-p, --pause', 
+		'whether or not to automatically start the ticker')
+	.option('-n <times>',
+		'run game in headless mode ')
 	.parse(process.argv);
 	
 var config = {
 	width: program.width || 50,
 	height: program.height || 25,
-	speed: program.speed || 250
+	speed: program.speed || 100
 };
 
 var screen = blessed.screen({
@@ -93,7 +95,7 @@ function onTick() {
 }
 
 var ticker = new Ticker(config.speed, onTick);
-if (program.autostart) {
+if (!program.pause) {
 	ticker.start();
 }
 

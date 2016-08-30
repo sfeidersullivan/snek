@@ -13,7 +13,7 @@ Clone this repo to a nice spot on your computer. Open a terminal emulator and `c
 If you're on Windows, cmd.exe, PowerShell, and git bash all work fine.
 On Mac OSX, Terminal.app will do.
 
-Make sure you have [node.js][nodejs] properly installed. Then use `npm` to install:
+Make sure you have [node.js](https://nodejs.org/en/) properly installed. Then use `npm` to install:
 
     $ npm install -g
 
@@ -52,12 +52,11 @@ The `getNextMove` function is called once per game tick. It receives two paramet
 
     {
         board: {
-            cells: []
+            cells: [...]
         },
         players: [
-            {
-
-            }
+            { ... },
+            { ... }
         ]
     }
 

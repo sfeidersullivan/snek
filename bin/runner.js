@@ -6,26 +6,24 @@ var blessed = require('blessed');
 var path = require('path');
 var Ticker = require('../lib/ticker.js');
 var App = require('../lib/app.js');
+var fs = require("fs");
 
 program._name = 'snek';
 program.usage('[options] <player1> <player2>')
-	.option('--width <width>', 
-		'specify the width of the grid', parseInt)
-	.option('--height <height>', 
-		'specify the height of the grid', parseInt)
 	.option('--speed <speed>', 
 		'specify the speed in milliseconds for each tick')
 	.option('-p, --pause', 
 		'whether or not to automatically start the ticker')
-	.option('-n <times>',
-		'run game in headless mode ')
+	.option('--map <map>',
+		'which map to load')
 	.parse(process.argv);
 	
 var config = {
-	width: program.width || 50,
-	height: program.height || 25,
-	speed: program.speed || 100
+	speed: program.speed || 100,
+	map: program.map || "maps/default.json"
 };
+
+config.map = JSON.parse(fs.readFileSync(config.map, { encoding: 'utf-8' }));
 
 var screen = blessed.screen({
 	debug: true
@@ -75,8 +73,8 @@ var app = new App(config, controller1, controller2);
 var box = blessed.box({
 	top: 2,
   left: 2,
-  width: config.width,
-  height: config.height + 2,
+  width: config.map.width,
+  height: config.map.height + 2,
   content: app.renderBoard(),
   tags: true,
   style: {

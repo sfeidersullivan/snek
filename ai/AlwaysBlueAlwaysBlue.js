@@ -229,31 +229,44 @@ function whichWay(nextPoint, head, gridMapped) {
 function dontDie(head, grid) {
     //No path to apple, try not to hit anything until a path can be found
     //Some sort of zig zag
-    if (goRightAgain && isRightSafe(head.x, head.y, head.direction, grid)) {
+    
+    //Double back
+    if (goRightAgain
+        && isRightSafe(head.x, head.y, head.direction, grid)){
+        //&& !isDeadEnd(head.x, head.y, head.direction, grid)) {
         goRightAgain = false;
         return "right";
     } 
-    if (goLeftAgain && isLeftSafe(head.x, head.y, head.direction, grid)) {
+    if (goLeftAgain
+        && isLeftSafe(head.x, head.y, head.direction, grid)){
+        //&& !isDeadEnd(head.x, head.y, head.direction, grid)) {
         goLeftAgain = false;
         return "left";
     }
-        
+    goRightAgain = false;
+    goLeftAgain = false;
 
-    if (isNextSafe(head.x, head.y, head.direction, grid))
+    //Keep going straight
+    if (isNextSafe(head.x, head.y, head.direction, grid)
+        && !isDeadEnd(head.x, head.y, head.direction, grid)
+        && !isWallTwoAway(head.x, head.y, head.direction, grid))
         return "";
     
-    if (goRight && isRightSafe(head.x, head.y, head.direction, grid)) {
+    //Alternate turning right then left
+    if (goRight
+        && isRightSafe(head.x, head.y, head.direction, grid)) {
         goRightAgain = true;
         goRight = !goRight;
         return "right";
     }
-    if (!goRight && isLeftSafe(head.x, head.y, head.direction, grid)) {
+    if (!goRight
+        && isLeftSafe(head.x, head.y, head.direction, grid)) {
         goLeftAgain = true;
         goRight = !goRight;
         return "left";
     }
 
-    //desperate attempts
+    //desperate attempts whichever way is safe
     if (isRightSafe(head.x, head.y, head.direction, grid))
         return "right";
     if (isLeftSafe(head.x, head.y, head.direction, grid))
@@ -263,10 +276,15 @@ function dontDie(head, grid) {
     return "";
 }
 
+//Checks if location is empty
 function isLocationSafe(x, y, grid) {
+    if (!isValidPoint(x, y, grid))
+        return false;
+
     return !grid[x][y];
 }
 
+//Checks if the next location (going straight) is empty
 function isNextSafe(x, y, direction, grid) {
     switch (direction) {
         case directions.NORTH:
@@ -285,6 +303,7 @@ function isNextSafe(x, y, direction, grid) {
     return false;
 }
 
+//Checks if the location to the right (based on head direction) is empty
 function isRightSafe(x, y, direction, grid) {
     switch (direction) {
         case directions.NORTH:
@@ -303,6 +322,7 @@ function isRightSafe(x, y, direction, grid) {
     return false;
 }
 
+//Checks if the location to the left (based on head direction) is empty
 function isLeftSafe(x, y, direction, grid) {
     switch (direction) {
         case directions.NORTH:
@@ -319,4 +339,75 @@ function isLeftSafe(x, y, direction, grid) {
             break;
     }
     return false;
+}
+
+//Checkouts if next location (going straight) has walls on both sides
+function isDeadEnd(x, y, direction, grid) {
+    //are we entering a dead end hole
+    var dirX = 0;
+    var dirY = 0;
+    switch (direction) {
+    case directions.NORTH:
+        dirY = -1;
+        break;
+    case directions.SOUTH:
+        dirY = 1;
+        break;
+    case directions.WEST:
+        dirX = -1;
+        break;
+    case directions.EAST:
+        dirX = 1;
+        break;
+    }
+
+    var tempX = x + dirX;
+    var tempY = y + dirY;
+    if (!isLeftSafe(tempX, tempY, direction, grid)
+        && !isRightSafe(tempX, tempY, direction, grid)) {
+        return true;
+    }
+
+    return false;
+}
+
+//Checks if the location 2 spaces straigh ahead is empty
+function isWallTwoAway(x, y, direction, grid) {
+    var dirX = 0;
+    var dirY = 0;
+    switch (direction) {
+        case directions.NORTH:
+            dirY = -2;
+            break;
+        case directions.SOUTH:
+            dirY = 2;
+            break;
+        case directions.WEST:
+            dirX = -2;
+            break;
+        case directions.EAST:
+            dirX = 2;
+            break;
+    }
+
+    var tempX = x + dirX;
+    var tempY = y + dirY;
+    if (!isValidPoint(tempX, tempY, grid))
+        return true;
+
+    if (!isNextSafe(tempX, tempY, direction, grid)) {
+        return true;
+    }
+
+    return false;
+}
+
+//Checks if coordinate is valid
+function isValidPoint(x, y, grid) {
+    if (x < 0 || x >= grid.length)
+        return false;
+    if (y < 0 || y >= grid[0].length)
+        return false;
+
+    return true;
 }

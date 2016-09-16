@@ -36,11 +36,36 @@ module.exports.getNextMove = function (game, player) {
         console.log(er);
     }
 
-    //console.log(grid0.toString());
-
     //Map the board to 1s and 0s
     var gridMapped = mapGrid(grid0);
-    var gridMappedTrans = _.zip.apply(_, gridMapped);
+
+    //Get path
+    var path = getPath(head.x, head.y, apple.x, apple.y, gridMapped);
+
+    if (path == null || path.length == 0) {
+        //console.log("-> path: na");
+        //console.log("-> head: " + head.x + "," + head.y + " = " + gridMapped[head.x][head.y]);
+        //console.log("-> apple: " + apple.x + "," + apple.y + " = " + gridMapped[apple.x][apple.y]);
+        //console.log("-> grid: " + gridMapped.length + "x" + gridMapped[0].length);
+
+        //If a path cannot be found, run "try not to die" logic
+        return dontDie(head, gridMapped);
+    } else {
+        //console.log("head: " + head.x + "," + head.y);
+        //console.log("next: " + nextPoint);
+        //console.log("apple: " + apple.x + "," + apple.y);
+        //console.log("head direction: " + head.direction.toString());
+
+        //Decide which way to turn
+        var dir = whichWay(path[1], head.x, head.y, head.direction, gridMapped);
+        //console.log("moved: " + dir.toString());
+        return dir;
+    }
+};
+
+//Run path finding algorithm
+function getPath(headX, headY, appleX, appleY, grid) {
+    var gridMappedTrans = _.zip.apply(_, grid);
     var gridPF = new PF.Grid(gridMappedTrans);
     //var gridPF2 = new PF.Grid(gridMappedTrans);
 
@@ -55,7 +80,15 @@ module.exports.getNextMove = function (game, player) {
         finder = new PF.BreadthFirstFinder({
             allowDiagonal: false,
         });
-        //finder2 = new PF.AStarFinder({
+        //finder = new PF.AStarFinder({
+        //    allowDiagonal: false,
+        //});
+        //99, 170, 63, 166, 138, 117, 80
+        //finder = new PF.BestFirstFinder({
+        //    allowDiagonal: false,
+        //});
+        //170, 83, 97, 156, 100
+        //finder = new PF.DijkstraFinder({
         //    allowDiagonal: false,
         //});
     } catch (er) {
@@ -65,42 +98,14 @@ module.exports.getNextMove = function (game, player) {
     //Find path (start, end, grid)
     var path;
     try {
-        path = finder.findPath(head.x, head.y, apple.x, apple.y, gridPF);
+        path = finder.findPath(headX, headY, appleX, appleY, gridPF);
         //console.log(path);
     } catch (er) {
         console.log(er);
     }
-    if (path == null || path.length == 0) {
-        //If a path cannot be found, run "try not to die" logic
-        return dontDie(head, gridMapped);
 
-        //console.log("-> path: na");
-        //console.log("-> head: " + head.x + "," + head.y + " = " + gridMapped[head.x][head.y]);
-        //console.log("-> apple: " + apple.x + "," + apple.y + " = " + gridMapped[apple.x][apple.y]);
-        //console.log("-> grid: " + gridMapped.length + "x" + gridMapped[0].length);
-        
-        //try {
-        //    path = finder2.findPath(head.x, head.y, apple.x, apple.y, gridPF2);
-        //} catch (er) {
-        //    console.log(er);
-        //}
-        if (path == null || path.length == 0) {
-            return "";
-        }
-    }
-    var nextPoint = path[1];
-    //console.log("head: " + head.x + "," + head.y);
-    //console.log("next: " + nextPoint);
-    //console.log("apple: " + apple.x + "," + apple.y);
-    //console.log("head direction: " + head.direction.toString());
-
-    //Decide which way to turn
-    var dir = whichWay(nextPoint, head, gridMapped);
-    //console.log("moved: " + dir.toString());
-
-    //console.log("");
-  return dir;  
-};
+    return path;
+}
 
 function mapGrid(grid){
     return grid.map(function (data) {
@@ -129,11 +134,11 @@ function mapGrid(grid){
     });
 };
 
-function whichWay(nextPoint, head, gridMapped) {
+function whichWay(nextPoint, headX, headY, direction, gridMapped) {
     //Right
-    if (nextPoint[0] > head.x) {
+    if (nextPoint[0] > headX) {
         //console.log("apple is to the right");
-        switch (head.direction) {
+        switch (direction) {
             case directions.NORTH:
                 return "right";
                 break;
@@ -142,9 +147,9 @@ function whichWay(nextPoint, head, gridMapped) {
                 break;
             case directions.WEST:
                 //This is tricky
-                if (!gridMapped[head.x][head.y - 1])
+                if (!gridMapped[headX][headY - 1])
                     return "right";
-                if (!gridMapped[head.x][head.y + 1])
+                if (!gridMapped[headX][headY + 1])
                     return "left";
                 return "";
                 break;
@@ -154,9 +159,9 @@ function whichWay(nextPoint, head, gridMapped) {
         }
     }
     //Left
-    if (nextPoint[0] < head.x) {
+    if (nextPoint[0] < headX) {
         //console.log("apple is to the left");
-        switch (head.direction) {
+        switch (direction) {
             case directions.NORTH:
                 return "left";
                 break;
@@ -168,23 +173,23 @@ function whichWay(nextPoint, head, gridMapped) {
                 break;
             case directions.EAST:
                 //This is tricky
-                if (!gridMapped[head.x][head.y + 1])
+                if (!gridMapped[headX][headY + 1])
                     return "right";
-                if (!gridMapped[head.x][head.y - 1])
+                if (!gridMapped[headX][headY - 1])
                     return "left";
                 return "";
                 break;
         }
     }
     //Below
-    if (nextPoint[1] > head.y) {
+    if (nextPoint[1] > headY) {
         //console.log("apple is below");
-        switch (head.direction) {
+        switch (direction) {
             case directions.NORTH:
                 //This is tricky
-                if (!gridMapped[head.x + 1][head.y])
+                if (!gridMapped[headX + 1][headY])
                     return "right";
-                if (!gridMapped[head.x - 1][head.y])
+                if (!gridMapped[headX - 1][headY])
                     return "left";
                 return "";
                 break;
@@ -200,17 +205,17 @@ function whichWay(nextPoint, head, gridMapped) {
         }
     }
     //Above
-    if (nextPoint[1] < head.y) {
+    if (nextPoint[1] < headY) {
         //console.log("apple is above");
-        switch (head.direction) {
+        switch (direction) {
             case directions.NORTH:
                 return "";
                 break;
             case directions.SOUTH:
                 //This is tricky
-                if (!gridMapped[head.x - 1][head.y])
+                if (!gridMapped[headX - 1][headY])
                     return "right";
-                if (!gridMapped[head.x + 1][head.y])
+                if (!gridMapped[headX + 1][headY])
                     return "left";
                 return "";
                 break;
@@ -230,6 +235,14 @@ function dontDie(head, grid) {
     //No path to apple, try not to hit anything until a path can be found
     //Some sort of zig zag
     
+    if (!isNextSafe(head.x, head.y, head.direction, grid)
+        || (isDeadEnd(head.x, head.y, head.direction, grid)
+            && isWallTwoAway(head.x, head.y, head.direction, grid))) {
+        if (moreSpaceToTheRight(head.x, head.y, head.direction, grid))
+            return "right";
+        return "left";
+    }
+
     //Double back
     if (goRightAgain
         && isRightSafe(head.x, head.y, head.direction, grid)){
@@ -377,16 +390,16 @@ function isWallTwoAway(x, y, direction, grid) {
     var dirY = 0;
     switch (direction) {
         case directions.NORTH:
-            dirY = -2;
+            dirY = -1;
             break;
         case directions.SOUTH:
-            dirY = 2;
+            dirY = 1;
             break;
         case directions.WEST:
-            dirX = -2;
+            dirX = -1;
             break;
         case directions.EAST:
-            dirX = 2;
+            dirX = 1;
             break;
     }
 
@@ -400,6 +413,31 @@ function isWallTwoAway(x, y, direction, grid) {
     }
 
     return false;
+}
+
+//Which is father to the wall, left or right?
+function moreSpaceToTheRight(x, y, direction, grid) {
+    var countLeft = 0;
+    var countRight = 0;
+
+    try {
+        for (iX = 0; iX < grid.length; iX++) {
+            for (iY = 0; iY < grid[0].length; iY++) {
+                var path = getPath(x, y, iX, iY, grid);
+                if (path && path.length > 1) {
+                    var dir = whichWay(path[1], x, y, direction, grid);
+                    if (dir === "right")
+                        countRight++;
+                    if (dir === "left")
+                        countLeft++;
+                }
+            }
+        }
+    } catch (er) {
+        console.log(er);
+    }
+    //console.log(countLeft + ":" + countRight);
+    return countRight > countLeft;
 }
 
 //Checks if coordinate is valid

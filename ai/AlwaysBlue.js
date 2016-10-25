@@ -33,7 +33,7 @@ module.exports.getNextMove = function (game, player) {
             });
         }
     } catch (er) {
-        console.log(er);
+        //console.log(er);
     }
 
     //Map the board to 1s and 0s
@@ -92,7 +92,7 @@ function getPath(headX, headY, appleX, appleY, grid) {
         //    allowDiagonal: false,
         //});
     } catch (er) {
-        console.log(er);
+        //console.log(er);
     }
 
     //Find path (start, end, grid)
@@ -101,7 +101,7 @@ function getPath(headX, headY, appleX, appleY, grid) {
         path = finder.findPath(headX, headY, appleX, appleY, gridPF);
         //console.log(path);
     } catch (er) {
-        console.log(er);
+        //console.log(er);
     }
 
     return path;
@@ -434,7 +434,7 @@ function moreSpaceToTheRight(x, y, direction, grid) {
             }
         }
     } catch (er) {
-        console.log(er);
+        //console.log(er);
     }
     //console.log(countLeft + ":" + countRight);
     return countRight > countLeft;

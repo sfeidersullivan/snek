@@ -7,6 +7,7 @@ var path = require('path');
 var Ticker = require('../lib/ticker.js');
 var App = require('../lib/app.js');
 var fs = require("fs");
+var Log = require("log");
 
 program._name = 'snek';
 program.usage('[options] <player1> <player2>')
@@ -16,11 +17,14 @@ program.usage('[options] <player1> <player2>')
 		'whether or not to automatically start the ticker')
 	.option('--map <map>',
 		'which map to load')
+	.option('--log <log>',
+		'a log file to use')
 	.parse(process.argv);
 	
 var config = {
 	speed: program.speed || 100,
-	map: program.map || "maps/default.json"
+	map: program.map || "maps/default.json",
+	log: program.log
 };
 
 config.map = JSON.parse(fs.readFileSync(config.map, { encoding: 'utf-8' }));
@@ -114,6 +118,11 @@ screen.key(['escape', 'q', 'C-c'], function(ch, key) {
 screen.render();
 
 
-console.log = function() {
-	screen.debug.apply(screen, arguments);
-};
+if (config.log) {
+	var logger = new Log('info', fs.createWriteStream(config.log));
+	console.log = logger.info.bind(logger);
+} else {
+	console.log = function() {
+		screen.debug.apply(screen, arguments);
+	};
+}
